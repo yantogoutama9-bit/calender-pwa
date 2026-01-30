@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HRIS Offline - Karyawan & Payroll</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a"/>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --muted:#9fb0d0;
+      --text:#e8efff;
+      --line:rgba(255,255,255,.10);
+      --accent:#38bdf8;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(900px 500px at 20% 0%, rgba(56,189,248,.18), transparent 55%),
+                  radial-gradient(900px 500px at 80% 10%, rgba(34,197,94,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(11,18,32,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:18px;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:12px;margin-top:2px}
+    .badge{
+      font-size:12px;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+    }
+    main{padding:18px 16px 80px}
+    .grid{
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media(max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background:rgba(15,27,51,.85);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .card .hd h2{margin:0;font-size:14px}
+    .card .bd{padding:14px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus,select:focus{border-color:rgba(56,189,248,.55)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    @media(max-width:520px){.two,.three{grid-template-columns:1fr}}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:600;
+    }
+    button.primary{
+      background: linear-gradient(135deg, rgba(56,189,248,.95), rgba(56,189,248,.55));
+      border-color:rgba(56,189,248,.35);
+      color:#03101d;
+    }
+    button.danger{
+      background:rgba(239,68,68,.14);
+      border-color:rgba(239,68,68,.35);
+      color:#ffd3d3;
+    }
+    button.ghost{background:transparent}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45}
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .toolbar .left, .toolbar .right{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{
+      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04); color:var(--muted); font-size:12px;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(0,0,0,.12);
+    }
+    th,td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      font-size:13px;
+      vertical-align:top;
+    }
+    th{
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.04);
+      position:sticky; top:0;
+    }
+    tr:last-child td{border-bottom:none}
+    .status{
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:12px; padding:4px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.good{background:var(--good)}
+    .dot.bad{background:var(--bad)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .actions button{padding:8px 10px;border-radius:12px;font-weight:700}
+    .actions button.small{font-size:12px}
+    .money{font-variant-numeric: tabular-nums}
+    footer{
+      position:fixed; bottom:0; left:0; right:0;
+      border-top:1px solid var(--line);
+      background:rgba(11,18,32,.9);
+      backdrop-filter: blur(10px);
+    }
+    .foot{
+      max-width:1200px;margin:0 auto;padding:10px 16px;
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      color:var(--muted);font-size:12px;
+    }
+    .toast{
+      position:fixed; right:16px; bottom:70px;
+      background:rgba(15,27,51,.95);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      color:var(--text);
+      max-width:320px;
+      display:none;
+    }
+    .toast.show{display:block;animation:pop .2s ease-out}
+    @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    .muted{color:var(--muted)}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .box{
+      flex:1 1 160px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+    }
+    .kpi .val{font-size:16px;font-weight:800}
+    .kpi .lbl{font-size:12px;color:var(--muted)}
+
+    .charts{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    @media(max-width:980px){.charts{grid-template-columns:1fr}}
+    .miniCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+      padding:12px;
+    }
+    .miniTitle{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .barWrap{
+      width:100%;
+      height:14px;
+      border-radius:999px;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .barFill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(135deg, rgba(56,189,248,.95), rgba(56,189,248,.45));
+      transition: width .25s ease;
+    }
+    .barFill2{
+      height:100%;
+      width:0%;
+      background:linear-gradient(135deg, rgba(34,197,94,.95), rgba(34,197,94,.45));
+      transition: width .25s ease;
+    }
+    .legend{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+      margin-top:8px;color:var(--muted);font-size:12px
+    }
+    .lgDot{width:10px;height:10px;border-radius:50%}
+    .lg1{background:rgba(56,189,248,.9)}
+    .lg2{background:rgba(34,197,94,.9)}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <h1>HRIS Offline — Database Karyawan & Payroll</h1>
+        <div class="sub">Tanpa server • Simpan offline • Bisa export/import • PWA siap install</div>
+      </div>
+      <div class="row" style="justify-content:flex-end">
+        <span class="badge" id="pwaStatus">📦 PWA: cek...</span>
+        <span class="badge" id="dataStatus">💾 Data: lokal</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- FORM -->
+    <section class="card">
+      <div class="hd">
+        <h2 id="formTitle">➕ Tambah Karyawan</h2>
+        <span class="pill" id="editingPill" style="display:none;">Mode Edit</span>
+      </div>
+      <div class="bd">
+        <form id="empForm">
+          <label>Nama Karyawan</label>
+          <input id="nama" placeholder="Contoh: Budi Santoso" required />
+
+          <div class="two">
+            <div>
+              <label>NIK / ID Karyawan</label>
+              <input id="nik" placeholder="Contoh: KRY-001" />
+            </div>
+            <div>
+              <label>Status</label>
+              <select id="status">
+                <option value="aktif">Aktif</option>
+                <option value="nonaktif">Tidak Aktif</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two">
+            <div>
+              <label>Jenis Kelamin</label>
+              <select id="jk" required>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+            </div>
+            <div>
+              <label>Unit Kerja</label>
+              <select id="unit" required></select>
+            </div>
+          </div>
+
+          <label>Jabatan</label>
+          <input id="jabatan" placeholder="Contoh: Admin / Kasir / Produksi" />
+
+          <div class="three">
+            <div>
+              <label>Gaji Pokok (Rp)</label>
+              <input id="gajiPokok" type="number" min="0" step="1000" placeholder="0" />
+            </div>
+            <div>
+              <label>Tunjangan (Rp)</label>
+              <input id="tunjangan" type="number" min="0" step="1000" placeholder="0" />
+            </div>
+            <div>
+              <label>Potongan (Rp)</label>
+              <input id="potongan" type="number" min="0" step="1000" placeholder="0" />
+            </div>
+          </div>
+
+          <label>Catatan</label>
+          <input id="catatan" placeholder="Opsional..." />
+
+          <div class="btns">
+            <button type="submit" class="primary" id="btnSave">💾 Simpan</button>
+            <button type="button" class="ghost" id="btnResetForm">🧹 Reset Form</button>
+            <button type="button" class="danger" id="btnDelete" style="display:none;">🗑️ Hapus</button>
+          </div>
+
+          <div class="hint">
+            🔒 Data disimpan di <b>browser (offline)</b>.  
+            Untuk pindah HP/laptop, gunakan <b>Export</b> lalu <b>Import</b>.
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- LIST -->
+    <section class="card">
+      <div class="hd">
+        <h2>📋 Data Karyawan</h2>
+        <span class="pill" id="countPill">0 data</span>
+      </div>
+      <div class="bd">
+
+        <div class="toolbar">
+          <div class="left">
+            <input id="search" placeholder="🔎 Cari nama / NIK / jabatan..." style="min-width:240px;max-width:360px"/>
+            <select id="filterUnit" style="min-width:220px">
+              <option value="">Semua Unit</option>
+            </select>
+            <select id="filterStatus" style="min-width:180px">
+              <option value="">Semua Status</option>
+              <option value="aktif">Aktif</option>
+              <option value="nonaktif">Tidak Aktif</option>
+            </select>
+          </div>
+          <div class="right">
+            <button id="btnExport">⬇️ Export JSON</button>
+            <button id="btnImport">⬆️ Import JSON</button>
+            <button id="btnResetAll" class="danger">🧨 Reset Data</button>
+          </div>
+        </div>
+
+        <div class="charts">
+          <div class="miniCard">
+            <div class="miniTitle">📊 Perbandingan Jenis Kelamin (Aktif)</div>
+            <div class="barWrap"><div class="barFill" id="barL"></div></div>
+            <div class="legend">
+              <span style="display:flex;align-items:center;gap:6px"><span class="lgDot lg1"></span> Laki-laki: <b id="cntL">0</b></span>
+              <span style="display:flex;align-items:center;gap:6px"><span class="lgDot lg2"></span> Perempuan: <b id="cntP">0</b></span>
+            </div>
+          </div>
+
+          <div class="miniCard">
+            <div class="miniTitle">📉 Turnover (Resign)</div>
+            <div class="barWrap"><div class="barFill2" id="barResign"></div></div>
+            <div class="legend">
+              <span>Resign (Nonaktif): <b id="cntResign">0</b></span>
+              <span>Total Data: <b id="cntTotal">0</b></span>
+              <span>Rate: <b id="rateResign">0%</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi" style="margin-bottom:12px">
+          <div class="box">
+            <div class="val" id="kpiAktif">0</div>
+            <div class="lbl">Karyawan Aktif</div>
+          </div>
+          <div class="box">
+            <div class="val" id="kpiNonaktif">0</div>
+            <div class="lbl">Karyawan Tidak Aktif (Resign)</div>
+          </div>
+          <div class="box">
+            <div class="val money" id="kpiPayroll">Rp 0</div>
+            <div class="lbl">Estimasi Total Payroll / Bulan (Aktif)</div>
+          </div>
+        </div>
+
+        <div style="overflow:auto; max-height: 58vh; border-radius:16px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:190px">Nama</th>
+                <th style="min-width:120px">NIK</th>
+                <th style="min-width:110px">JK</th>
+                <th style="min-width:180px">Unit</th>
+                <th style="min-width:140px">Jabatan</th>
+                <th style="min-width:120px">Status</th>
+                <th style="min-width:140px">Gaji Bersih</th>
+                <th style="min-width:160px">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="hint">
+          💡 Resign = ubah status jadi <b>Tidak Aktif</b>. Turnover otomatis keitung.
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="foot">
+    <div>⚡ HRIS Offline PWA • Versi <span id="ver">1.1</span></div>
+    <div class="muted">Made for Yanto Goutama 😄</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="fileInput" accept="application/json" style="display:none"/>
+
+<script src="app.js"></script>
+</body>
+</html>

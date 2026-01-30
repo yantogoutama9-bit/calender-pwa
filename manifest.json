@@ -1,0 +1,21 @@
+{
+  "name": "HRIS Offline - Karyawan & Payroll",
+  "short_name": "HRIS Offline",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0f172a",
+  "description": "Aplikasi HRIS offline untuk data karyawan + payroll flat bulanan. Support export/import JSON.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
