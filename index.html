@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HRIS YG</title>
+
+  <!-- PWA optional -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#0b1220;color:#e5e7eb}
+    .wrap{max-width:1100px;margin:auto;padding:20px}
+    .card{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin:12px 0}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1;min-width:240px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0b1220;color:#e5e7eb}
+    button{cursor:pointer;background:#0ea5e9;border:none;color:#001018;font-weight:700}
+    button:hover{filter:brightness(1.05)}
+    .muted{opacity:.7;font-size:13px}
+    .danger{color:#fca5a5}
+    .ok{color:#86efac}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px;text-align:left;vertical-align:top}
+    th{opacity:.8}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .pill{padding:6px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:13px}
+    .hide{display:none !important}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h2 style="margin:0">HRIS YG 🚀</h2>
+      <div class="pill" id="statusText">Status: <span class="muted">cek...</span></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="card" id="loginBox">
+      <h3 style="margin-top:0">Login Admin</h3>
+      <div class="row">
+        <div class="col">
+          <label>Email</label>
+          <input id="loginEmail" type="email" placeholder="email" />
+        </div>
+        <div class="col">
+          <label>Password</label>
+          <input id="loginPassword" type="password" placeholder="password" />
+        </div>
+      </div>
+      <div style="margin-top:12px" class="row">
+        <div class="col">
+          <button id="btnLogin">Login</button>
+          <div class="muted" style="margin-top:10px">
+            Kalau mentok, cek tulisan status di atas.
+          </div>
+          <div id="loginMsg" class="muted" style="margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div class="card hide" id="appBox">
+      <div class="topbar">
+        <h3 style="margin:0">Data Karyawan</h3>
+        <div class="row" style="margin:0;gap:8px">
+          <button id="btnReload" style="width:auto;padding:10px 14px">Reload</button>
+          <button id="btnLogout" style="width:auto;padding:10px 14px;background:#ef4444;color:white">Logout</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div class="col">
+          <label>Filter Unit Kerja</label>
+          <select id="filterUnit"></select>
+        </div>
+        <div class="col">
+          <label>Ringkasan</label>
+          <div class="pill" id="summaryText">-</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>NIK</th>
+              <th>JK</th>
+              <th>Unit</th>
+              <th>Jabatan</th>
+              <th>Status</th>
+              <th>Join</th>
+              <th>Resign</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEmployees"></tbody>
+        </table>
+      </div>
+
+      <div class="muted" style="margin-top:10px">
+        Note: Kalau tabel kosong tapi login sukses, berarti RLS / data belum ada.
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPABASE (WAJIB) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- APP -->
+  <script src="./app.js"></script>
+
+  <!-- SW optional -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
+</body>
+</html>
